@@ -4,7 +4,6 @@
 #include "quantum.h"
 #include "lib/oled.h"
 #include "timer.h"
-// #include "rgblight.h"
 
 // Declare a flag and timer variable
 bool show_emoji = false;
@@ -64,15 +63,33 @@ void keyboard_post_init_user(void) {
 #endif
 }
 
+void set_persistent_led(uint8_t key, uint8_t red, uint8_t green, uint8_t blue) {
+    // Disable animation for the specific key
+    rgb_matrix_config.enable = false;
+
+    // Set the LED color
+    rgb_matrix_set_color(key, red, green, blue);
+
+    // Re-enable the animation
+    rgb_matrix_config.enable = true;
+}
+
+bool rgb_matrix_indicators_user(void) {
+    // Example: Set LED for key 10 to red
+    set_persistent_led(10, 255, 0, 0);
+
+    return false;
+}
+
 // This function is called whenever the layer state changes.
 layer_state_t layer_state_set_user(layer_state_t state) {
     uint8_t layer = get_highest_layer(state);
 
     // Set the flag and start the timer
-    show_emoji = true;
-    emoji_timer = timer_read();
+    // show_emoji = true;
+    // emoji_timer = timer_read();
 
-    // Update the RGB lighting based on the active layer
+    // // Update the RGB lighting based on the active layer
     switch (layer) {
         case 0: // Base Layer (Colemak-DH)
             rgblight_sethsv_noeeprom(180, 255, 255); // Teal
@@ -82,6 +99,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
             break;
         case 2: // RGB/Reset
             rgblight_sethsv_noeeprom(43, 255, 255);  // Yellow
+            // rgblight_sethsv_at(255, 255, 255, 0);    // White
             break;
         case 3: // QWERTY
             rgblight_sethsv_noeeprom(85, 255, 255);  // Green
@@ -96,4 +114,3 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
     return state;
 }
-
